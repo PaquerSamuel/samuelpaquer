@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programas.exe</title>
+    <!-- Ícones do FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Ícone da Aba (Favicon) -->
+    <link rel="icon" type="image/png" href="Fotos/1234.fw.png">
+	<!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.65);
+            --card-hover: rgba(51, 65, 85, 0.85);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #38bdf8;
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Container Principal */
+        .container {
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Canvas Interativo em Fundo Fixo */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: auto;
+        }
+
+        /* Botão Voltar */
+        .back-nav {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn i {
+            font-size: 12px;
+            color: var(--accent-color);
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--card-hover);
+            border-color: var(--accent-color);
+            transform: translateX(-3px);
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-3px);
+        }
+
+        /* Perfil / Header */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+        }
+
+        .profile-header p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 400;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Grid de Programas */
+        .links-grid {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .link-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px -1px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .link-card:hover {
+            background: var(--card-hover);
+            transform: translateY(-3px);
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.25);
+        }
+
+        .link-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .link-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .link-title {
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .link-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .link-arrow {
+            color: var(--text-secondary);
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .link-card:hover .link-arrow {
+            transform: translateX(4px);
+            color: var(--text-primary);
+        }
+
+        /* Estilos do Menu Expansível (Acordeão) */
+        .dropdown-card {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0;
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .dropdown-card.active .dropdown-arrow {
+            transform: rotate(180deg);
+            color: var(--accent-color);
+        }
+
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.3s ease;
+            background: rgba(15, 23, 42, 0.3);
+            border-bottom-left-radius: 14px;
+            border-bottom-right-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 15px;
+        }
+
+        .dropdown-card.active .dropdown-content {
+            max-height: 400px;
+            padding: 10px 15px 15px 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sub-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .sub-link:hover {
+            background: var(--card-hover);
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateX(4px);
+        }
+
+        .sub-link i {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .sub-link:hover i {
+            color: var(--accent-color);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 30px;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        footer span {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas para Animação de Fundo Interativa -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <!-- Navegação de Retorno -->
+        <div class="back-nav">
+            <a href="index.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Voltar ao Início
+            </a>
+        </div>
+
+        <!-- Cabeçalho -->
+        <header class="profile-header">
+            <h1>Programas.exe</h1>
+            <p>Repositório de utilitários e softwares essenciais</p>
+        </header>
+
+        <!-- Lista de Programas (Ordem Alfabética + Categoria Windows XP) -->
+        <div class="links-grid">
+
+            <!-- Categoria Windows XP Expansível -->
+            <div class="link-card dropdown-card" id="winXpDropdown">
+                <div class="dropdown-header" onclick="toggleDropdown()">
+                    <div class="link-content">
+                        <div class="link-info">
+                            <span class="link-title">Theme Windows XP</span>
+                            <span class="link-desc">Programas e Wallpapers</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down link-arrow dropdown-arrow"></i>
+                </div>
+                <div class="dropdown-content">
+                    <!-- Link para o Windhawk -->
+                    <a href="https://raw.githubusercontent.com/PaquerSamuel/samuelpaquer/main/Programas/windhawk_setup.exe" class="sub-link" target="_blank">
+                        <span>Windhawk (Barra de Tarefas) - 9MB</span>
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+
+                    <!-- Link para o Open-Shell -->
+                    <a href="https://raw.githubusercontent.com/PaquerSamuel/samuelpaquer/main/Programas/OpenShellSetup_4_4_198.exe" class="sub-link" target="_blank">
+                        <span>Open-Shell-Menu (Menu Iniciar) - 11MB</span>
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+
+                    <!-- Link para os Wallpapers -->
+                    <a href="https://raw.githubusercontent.com/PaquerSamuel/samuelpaquer/main/Programas/Wallpapers%20Windows%20XP.png" class="sub-link" target="_blank">
+                        <span>Wallpapers Windows XP (Full HD 1080p) - 4MB</span>
+                        <i class="fa-solid fa-image"></i>
+                    </a>
+
+                    <!-- Link para os Wallpapers Blur -->
+                    <a href="https://raw.githubusercontent.com/PaquerSamuel/samuelpaquer/main/Programas/Wallpapers%20Windows%20XP%20Blur.png" class="sub-link" target="_blank">
+                        <span>Wallpapers Windows XP Blur (Full HD 1080p) - 4MB</span>
+                        <i class="fa-solid fa-image"></i>
+                    </a>
+                </div>
+            </div>
+
+            <a href="https://drive.google.com/file/d/1m3hIi6JDg2Tph818El82AIveoJVbVWSb/view?usp=drivesdk" class="link-card" target="_blank">
+                <div class="link-content">
+                    <div class="link-info">
+                        <span class="link-title">Adobe Acrobat Pro DC 2020</span>
+                        <span class="link-desc">Leitor e editor avançado de PDF - 679MB</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-download link-arrow"></i>
+            </a>
+
+            <a href="https://drive.google.com/file/d/1JJP9OaDFKnQdl-uHRhzqOURKJfF8oKEu/view?usp=drivesdk" class="link-card" target="_blank">
+                <div class="link-content">
+                    <div class="link-info">
+                        <span class="link-title">Adobe Fireworks CS6</span>
+                        <span class="link-desc">Editor de Imagens - 152MB</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-download link-arrow"></i>
+            </a>
+
+            <a href="https://drive.google.com/file/d/1S66aPfAaHlhHAeNbNfy7dpaSY-d6S6rn/view?usp=drivesdk" class="link-card" target="_blank">
+                <div class="link-content">
+                    <div class="link-info">
+                        <span class="link-title">Adobe Photoshop CS6 Portable</span>
+                        <span class="link-desc">Versão Portátil - 138MB</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-download link-arrow"></i>
+            </a>
+
+            <a href="https://drive.google.com/file/d/1uqFh7PoeWo4UEjhXIvvb_ad3fK8eqIBq/view?usp=drivesdk" class="link-card" target="_blank">
+                <div class="link-content">
+                    <div class="link-info">
+                        <span class="link-title">CCleaner Professional Plus 6.39</span>
+                        <span class="link-desc">Inclui Recuva e Speccy (Multilingual) - 111MB</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-download link-arrow"></i>
+            </a>
+
+            <a href="https://drive.google.com/file/d/1zzTOjR3Pwztc36kQ4mM55ooUfsdz100f/view?usp=drivesdk" class="link-card" target="_blank">
+                <div class="link-content">
+                    <div class="link-info">
+                        <span class="link-title">Movavi Video Editor Plus 2025</span>
+                        <span class="link-desc">Editor de Vídeo - 129MB</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-download link-arrow"></i>
+            </a>
+
+        </div>
+
+        <footer>
+            <p>&copy; 2026 <span>Samuel Paquer de Souza</span>. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Script para controlar a expansão do menu Windows XP -->
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('winXpDropdown');
+            dropdown.classList.toggle('active');
+        }
+    </script>
+
+    <!-- Script de Fundo Interativo -->
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        let ripples = [];
+
+        const mouse = { x: null, y: null, radius: 150 };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initParticles();
+        }
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
+        });
+        window.addEventListener('touchend', () => { mouse.x = null; mouse.y = null; });
+        window.addEventListener('click', (e) => { createRipple(e.clientX, e.clientY); });
+
+        function createRipple(x, y) {
+            ripples.push({ x: x, y: y, radius: 5, maxRadius: 180, alpha: 1 });
+            const particleCount = 20;
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (Math.PI * 2 / particleCount) * i;
+                const speed = Math.random() * 3 + 2;
+                particles.push(new Particle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, Math.random() * 2.5 + 1, true));
+            }
+        }
+
+        class Particle {
+            constructor(x, y, vx, vy, size, isBurst = false) {
+                this.x = x !== undefined ? x : Math.random() * width;
+                this.y = y !== undefined ? y : Math.random() * height;
+                this.vx = vx !== undefined ? vx : (Math.random() - 0.5) * 1.2;
+                this.vy = vy !== undefined ? vy : (Math.random() - 0.5) * 1.2;
+                this.radius = size !== undefined ? size : Math.random() * 2 + 1;
+                const colors = ['#38bdf8', '#818cf8', '#60a5fa', '#a7f3d0'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.isBurst = isBurst;
+                this.life = 1;
+                this.decay = Math.random() * 0.015 + 0.008;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.isBurst) {
+                    this.life -= this.decay;
+                } else {
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+                }
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let forceDirectionX = dx / distance;
+                        let forceDirectionY = dy / distance;
+                        let maxDistance = mouse.radius;
+                        let force = (maxDistance - distance) / maxDistance;
+                        this.x -= forceDirectionX * force * 3;
+                        this.y -= forceDirectionY * force * 3;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.isBurst ? Math.max(0, this.life) : 0.8;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor((width * height) / 10000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function connectParticles() {
+            const maxDistance = 120;
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a + 1; b < particles.length; b++) {
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < maxDistance) {
+                        let opacity = 1 - (distance / maxDistance);
+                        ctx.save();
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${opacity * 0.25})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = particles[a].x - mouse.x;
+                    let dy = particles[a].y - mouse.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let opacity = 1 - (distance / mouse.radius);
+                        ctx.save();
+                        ctx.strokeStyle = `rgba(129, 140, 248, ${opacity * 0.4})`;
+                        ctx.lineWidth = 1.2;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+        }
+
+        function handleRipples() {
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                let r = ripples[i];
+                r.radius += 3;
+                r.alpha -= 0.015;
+                if (r.alpha <= 0 || r.radius >= r.maxRadius) {
+                    ripples.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(56, 189, 248, ${r.alpha})`;
+                ctx.lineWidth = 2;
+                ctx.shadowColor = '#38bdf8';
+                ctx.shadowBlur = 12;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, width, height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update();
+                p.draw();
+                if (p.isBurst && p.life <= 0) particles.splice(i, 1);
+            }
+
+            connectParticles();
+            handleRipples();
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = function() {
+            resize();
+            animate();
+        };
+    </script>
+</body>
+</html>
